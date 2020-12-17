@@ -5,7 +5,6 @@ jobs:
     
     steps:
       - bash: |
-          set -e
           python3 -m venv .venv
           source .venv/bin/activate
           python tools/pipstrap.py
