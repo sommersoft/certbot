@@ -11,9 +11,10 @@ jobs:
           python tools/pipstrap.py
           for x in */docs
           do
+            echo ""
             echo "##[group]Building $x"
             pip install -qq -e $x/..[docs]
-            sphinx-build -EWq --keep-going -b html $x $x/_build/html
+            sphinx-build -EW --keep-going -b html $x $x/_build/html
             echo "##[endgroup]"
 
           done
