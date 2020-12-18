@@ -1,5 +1,5 @@
 jobs:
-  - job: doc_test
+  - job: test_sphinx_builds
     pool:
       vmImage: ubuntu-latest
 
@@ -16,16 +16,14 @@ jobs:
             echo "##[group]Building $x"
             pip install -q -e $x/..[docs]
             if ! sphinx-build -EW --keep-going -b html $x $x/_build/html; then
-              FINAL_STATUS=1;
+              FINAL_STATUS=1
               FAILED_BUILDS[${#FAILED_BUILDS[@]}]="${x%/docs}"
             fi
-            echo "final: $FINAL_STATUS"
             echo "##[endgroup]"
 
           done
-          echo "final: $FINAL_STATUS"
-          echo "failed: ${FAILED_BUILDS[*]}"
           if [ $FINAL_STATUS != 0 ]; then
-            echo "##[error]The following builds failed: ${FAILED_BUILDS[*]}";
+            echo "##[error]The following builds failed: ${FAILED_BUILDS[*]}"
+            exit 1
           fi
         displayName: Build Sphinx Documentation
