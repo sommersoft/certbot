@@ -5,6 +5,8 @@ jobs:
     
     steps:
       - bash: |
+          FINAL_STATUS=0
+          declare -a FAILED_BUILDS
           python3 -m venv .venv
           source .venv/bin/activate
           python tools/pipstrap.py
@@ -12,9 +14,15 @@ jobs:
           do
             echo ""
             echo "##[group]Building $x"
-            pip install -qq -e $x/..[docs]
-            sphinx-build -EW --keep-going -b html $x $x/_build/html
+            pip install -q -e $x/..[docs]
+            if ! sphinx-build -EW --keep-going -b html $x $x/_build/html; then
+              FINAL_STATUS=1;
+              FAILED_BUILDS[${#FAILED_BUILDS[@]}]="${x%/docs}"
+            fi
             echo "##[endgroup]"
 
           done
+          if [ FINAL_STATUS = 1 ]; then
+            echo "##[error]The following builds failed: ${FAILED_BUILDS[*]}";
+          fi
         displayName: Build Sphinx Documentation
